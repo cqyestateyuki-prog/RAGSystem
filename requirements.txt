@@ -1,0 +1,12 @@
+openai
+elasticsearch
+requests
+pymupdf
+jieba
+python-dotenv
+langchain_community
+langchain
+tiktoken
+transformers>=4.51.0
+torch
+sentencepiece

@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# 环境变量和配置文件（包含敏感信息）
+.env
+.env_qwen
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# Elasticsearch 本地数据
+elastic-start-local/
+
+# 生成的图片和 PDF
+pdf_images/
+*.pdf
+
+# 日志文件
+*.log
+
+# 测试文件
+test_images_tables.py
+
