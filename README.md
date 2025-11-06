@@ -21,7 +21,6 @@
 - ✅ LLM 生成答案（支持多种模型：通义千问、DeepSeek、Ollama 等）
 - ✅ **自动引用来源**：显示文件名和页码
 - ✅ **相关性检查**：检测问题与文档库的相关性，不相关时提示用户
-- ✅ **去重显示**：自动去重同一文件同一页的多个文档片段
 - ✅ **页码过滤**：自动过滤文本开头的页码，避免重复显示
 
 #### 4. **高级增强能力**
@@ -80,9 +79,13 @@ curl http://elastic:ZXKwLNQD@localhost:9200
 ```
 
 
-#### 3. LLM 配置（推荐：通义千问）
+#### 3. LLM 配置（生成答案用）
 
-**方式1：自动配置（推荐）**
+系统支持多种 LLM 模型，推荐按以下顺序选择：
+
+**✅ 方案1：通义千问（Qwen，推荐）**
+
+**自动配置（推荐）**：
 ```bash
 # 系统会自动加载 .env_qwen 文件（如果存在）
 # 配置文件已创建：.env_qwen
@@ -90,11 +93,79 @@ curl http://elastic:ZXKwLNQD@localhost:9200
 python rag_system.py --index test_index_1
 ```
 
-**方式2：手动设置环境变量**
+**手动配置**：
 ```bash
 export OPENAI_API_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
 export OPENAI_API_KEY=你的_qwen_api_key
 ```
+
+**获取 API Key**：访问 https://dashscope.console.aliyun.com/ 注册并申请
+
+**模型名称**：`qwen-plus`, `qwen-max`, `qwen-turbo`
+
+---
+
+**✅ 方案2：DeepSeek（免费且强大）**
+
+**配置方法**：
+```bash
+export DEEPSEEK_API_KEY=你的_deepseek_key
+export OPENAI_API_BASE_URL=https://ark.cn-beijing.volces.com/api/v3
+```
+
+**获取 API Key**：访问 https://www.volcengine.com/product/ark 注册火山引擎账号并申请
+
+**模型名称**：`deepseek-v3-250324` 或 `deepseek-chat`
+
+---
+
+**✅ 方案3：本地模型（Ollama，完全免费）**
+
+**安装 Ollama**：
+```bash
+# macOS
+brew install ollama
+# 或访问 https://ollama.ai 下载
+```
+
+**启动本地模型**：
+```bash
+# 下载模型（首次需要）
+ollama pull qwen2.5:7b
+
+# 启动服务
+ollama serve
+```
+
+**配置方法**：
+```bash
+export OPENAI_API_BASE_URL=http://localhost:11434/v1
+export OPENAI_API_KEY=ollama  # 可以是任意值
+```
+
+**模型名称**：`qwen2.5:7b`, `llama3.2:3b`, `mistral` 等
+
+---
+
+**✅ 方案4：其他 OpenAI 兼容接口**
+
+支持任何提供 OpenAI 兼容接口的服务：
+- Groq（快速，免费额度）
+- Together.ai（多种开源模型）
+- Anthropic Claude
+- 本地部署的 vLLM
+
+**配置方法**：
+```bash
+export OPENAI_API_BASE_URL=你的服务地址
+export OPENAI_API_KEY=你的_api_key
+```
+
+---
+
+**⚠️ 注意**：
+- 如果未配置 LLM，系统会自动回退到简单拼接方式，仍然可以查看检索结果
+- 所有模型都通过 OpenAI 兼容接口调用，使用相同的代码
 
 #### 4. 其他环境变量（可选：Web 搜索 & DeepSeek）
 新建 `.env` 文件（与 `websearch.py` 一致）：
@@ -214,17 +285,31 @@ python -c "from ingest_images_tables import ingest_tables; ingest_tables('test_i
 
 **启动 RAG 系统主界面**（推荐方式）：
 ```bash
+# 方式1：直接进入问答模式（如果已指定索引）
 python rag_system.py --index test_index_1
+
+# 方式2：显示菜单系统（推荐，功能更全）
+python rag_system.py
 ```
 
 **✨ 自动配置**：系统启动时会自动加载 `.env_qwen` 配置文件（如果存在），无需手动设置环境变量！
 
-**主界面功能**：
-1. **导入 PDF 文件**：批量入库文件夹中的所有 PDF
-2. **查看已导入的文档**：显示索引统计和所有参考 PDF
-3. **开始问答**：启动交互式问答系统
-4. **快速检索测试**：快速测试检索功能
-5. **退出**
+**主界面菜单功能**：
+1. **Create index**：创建新的 Elasticsearch 索引
+2. **Delete index**：删除索引
+3. **Add PDF to existing index**：批量导入 PDF 文件（文本、图片、表格）
+4. **Search in existing index**：快速检索测试（不生成答案）
+5. **List indices**：列出所有索引
+6. **Start QA in index**：启动交互式问答系统（推荐）
+7. **Web search QA**：Web 搜索问答
+8. **RAG Fusion QA (multi-query)**：RAG Fusion 多查询融合问答
+9. **Exit**：退出
+
+**⚠️ 重要提示：Embedding 模型一致性**
+- 选项3（Add PDF）会询问是否使用本地 embedding 模型
+- 选项4、6、8（检索/问答）也会询问是否使用本地 embedding 模型
+- **必须保持一致**：如果索引是用本地模型创建的，检索时也要使用本地模型
+- 模型不一致会导致检索结果完全不同！
 
 **启动时自动导入 PDF**：
 ```bash
@@ -237,9 +322,14 @@ python rag_system.py --index test_index_1 --auto-import test_pdf/
 # 使用 rerank（问答时）
 python rag_system.py --index test_index_1 --rerank
 
-# 使用本地 embedding 模型
+# 使用本地 embedding 模型（必须与索引创建时一致）
 python rag_system.py --index test_index_1 --use-local
 ```
+
+**⚠️ Embedding 模型一致性说明**：
+- 如果索引是用**本地模型**创建的（选项3时选择了 `y`），检索时也要选择使用本地模型
+- 如果索引是用**远程服务**创建的（选项3时选择了 `n`），检索时也要选择使用远程服务
+- 模型不一致会导致检索结果完全不同！
 
 ### 五、分步启动（可选）
 
@@ -252,7 +342,7 @@ python batch_ingest.py --index test_index_1 --pdf test_pdf/
 
 **交互式问答**：
 ```bash
-python interactive_qa.py --index test_index_1
+python rag_system.py --index test_index_1
 ```
 
 **详细启动指南**：见 `START_RAG.md`
@@ -261,10 +351,9 @@ python interactive_qa.py --index test_index_1
 - ✅ **持续提问**：无需重复启动，可以连续提问
 - ✅ **LLM 生成答案**：使用 LLM 理解上下文并生成答案（不只是简单拼接）
 - ✅ **自动引用来源**：每个答案都显示来源（文件名 + 页码）
-- ✅ **智能去重**：自动去重同一文件同一页的多个文档片段
 - ✅ **相关性检查**：检测问题与文档库的相关性，不相关时提示用户
 - ✅ **页码过滤**：自动过滤文本开头的页码，避免重复显示
-- ✅ **参考文档列表**：显示检索到的所有参考文档及其预览
+- ✅ **参考文档列表**：显示检索到的所有参考文档及其预览（可能包含同一页的多个片段）
 - ✅ **退出命令**：输入 `exit`、`quit`、`退出` 或 `q` 退出
 
 **问答示例**：
@@ -294,12 +383,12 @@ AI 回答:
 
 **使用 Rerank**：
 ```bash
-python interactive_qa.py --index test_index_1 --rerank
+python rag_system.py --index test_index_1 --rerank
 ```
 
 **使用本地模型**：
 ```bash
-python interactive_qa.py --index test_index_1 --use-local
+python rag_system.py --index test_index_1 --use-local
 ```
 
 ### 六、检索系统详解
@@ -478,8 +567,7 @@ print(ask_llm(query, webctx))
 
 | 文件 | 功能说明 |
 |------|---------|
-| `rag_system.py` | **主入口**：统一启动界面，提供菜单选项 |
-| `interactive_qa.py` | **交互式问答**：LLM 生成答案，显示引用来源 |
+| `rag_system.py` | **主入口**：统一启动界面，提供菜单选项（创建索引、导入PDF、问答等） |
 | `batch_ingest.py` | **批量入库**：扫描文件夹，自动处理文本/图片/表格 |
 | `retrieve_documents.py` | **检索核心**：混合检索、RRF 融合、Rerank |
 | `document_process.py` | **文档处理**：PDF 文本提取与分块 |
@@ -502,7 +590,7 @@ print(ask_llm(query, webctx))
    es_functions.py (写入 ES)
 
 2. 问答流程：
-   interactive_qa.py
+   rag_system.py (交互式问答)
       ↓
    retrieve_documents.py (混合检索 + RRF)
       ↓
@@ -518,7 +606,6 @@ print(ask_llm(query, webctx))
 - **混合检索**：BM25 + 向量检索，兼顾精确匹配和语义匹配
 - **RRF 融合**：稳定且高效的排序融合算法
 - **元数据管理**：文件名、页码、文档类型等元数据完整存储
-- **智能去重**：按文件+页码去重，避免重复显示
 - **相关性检查**：基于 RRF 分数判断相关性，提升答案质量
 
 ### 十二、常见问题（FAQ）
@@ -543,10 +630,10 @@ print(ask_llm(query, webctx))
 - 这是正常现象，rerank 可能因远程服务或模型推理的非确定性导致
 - 建议优先使用 RRF 混合检索（不加 `--rerank`），通常已足够准确且稳定
 
-**Q: 参考文档数量少于 5 条？**
-- 系统会自动去重同一文件同一页的多个文档片段
-- 如果检索结果包含多个来自同一页的片段，去重后显示数量会减少
-- 这是正常现象，确保每个来源只显示一次
+**Q: 参考文档中有重复的同一页？**
+- 这是正常现象，因为同一页可能被分成多个文档片段（chunks）
+- 每个片段都是独立的检索结果，都会显示在参考文档列表中
+- 系统会显示每个片段的内容预览，帮助理解上下文
 
 **Q: 问题与文档库不相关时如何处理？**
 - 系统会自动检查检索结果的相关性分数
@@ -557,5 +644,13 @@ print(ask_llm(query, webctx))
 - 确保 LLM 配置正确（检查 `.env_qwen` 或环境变量）
 - 系统会要求 LLM 在答案中标注来源（文件名+页码）
 - 如果 LLM 未按要求标注，可以在答案下方的参考文档列表中查看来源
+
+**Q: ⚠️ 检索结果与之前完全不同？**
+- **最可能的原因**：索引创建时使用的 embedding 模型与检索时不一致
+- **解决方案**：
+  - 如果索引是用**本地模型**创建的（选项3或 `batch_ingest.py --use-local`），检索时也要使用本地模型（选项4/6/8时选择 `y`，或 `rag_system.py --use-local`）
+  - 如果索引是用**远程服务**创建的（选项3或 `batch_ingest.py` 默认），检索时也要使用远程服务（选项4/6/8时选择 `n`，或 `rag_system.py` 默认）
+  - **重要**：不同 embedding 模型生成的向量空间不同，必须保持一致！
+  - **建议**：创建索引时记住使用的模型类型，检索时选择相同的模型
 
 

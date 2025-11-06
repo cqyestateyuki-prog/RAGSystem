@@ -25,7 +25,6 @@ def process_pdf(es_index, file_path):
     loader = PyMuPDFLoader(file_path) # 如果报错则使用 PyMuPDFLoader 处理 pdf 文件
     pages = loader.load()
 
-
     # 使用递归分割器，保证在自然断点处切分；重叠 100 token 保留跨块上下文
     textsplit = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=100, length_function=num_tokens_from_string)
     chunks = textsplit.split_documents(pages)

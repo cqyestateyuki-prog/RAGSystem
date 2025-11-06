@@ -441,7 +441,6 @@ def query_decompositon(query):
     parsed_result = json.loads(result)
     return parsed_result.get("query")
 
-
 if __name__ == '__main__':
     query = '刑事诉讼法'
     # result_doc = elastic_search(query, 'test_index_1')
@@ -458,7 +457,6 @@ if __name__ == '__main__':
     #     print(f"   Rerank Score: {doc.get('score', '-')}")
     #     print("-" * 60)
     
-    
     # print(rag_fusion(query))
     
     # 多轮对话场景：用户询问关于公司法的问题，然后询问相关细节
@@ -473,8 +471,6 @@ if __name__ == '__main__':
     print(f"原始查询: {query}")
     print(f"聊天历史: {chat_history}")
     print(f"消解结果: {coreference_resolution(query, chat_history)}")
-
-
 
 
     # query = "Find affordable smartphones with 5G connectivity, over 4000mAh battery, and excellent camera quality under $500."
