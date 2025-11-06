@@ -1,35 +1,54 @@
-## RAG Demo 项目说明
+## RAG Demo 项目说明 / Project Description
 
 本项目实现了一个完整的 **Retrieval-Augmented Generation (RAG)** 系统，支持 PDF 文档的智能问答。
 
-### 🎯 核心功能
+This project implements a complete **Retrieval-Augmented Generation (RAG)** system that supports intelligent Q&A for PDF documents.
 
-#### 1. **文档处理与入库**
-- ✅ PDF 文本提取与智能分块（chunk_size=1024, overlap=100）
-- ✅ 图片 OCR 提取与上下文增强
-- ✅ 表格结构化提取与描述生成
-- ✅ 批量处理文件夹中的所有 PDF
-- ✅ 向量化（Embedding）并存储到 Elasticsearch
+### 🎯 核心功能 / Key Features
 
-#### 2. **混合检索系统**
-- ✅ **关键词检索（BM25）**：精确匹配关键词
-- ✅ **向量检索**：语义相似度搜索
-- ✅ **RRF 融合**：Reciprocal Rank Fusion 算法融合两种检索结果
-- ✅ **可选重排序**：Reranker 模型进一步优化排序（可选）
+#### 1. **文档处理与入库 / Document Processing & Ingestion**
+- ✅ PDF 文本提取与智能分块（chunk_size=1024, overlap=100）  
+  PDF text extraction and intelligent chunking (chunk_size=1024, overlap=100)
+- ✅ 图片提取与上下文增强  
+  Image extraction with context enhancement
+- ✅ 表格结构化提取与描述生成  
+  Structured table extraction and description generation
+- ✅ 批量处理文件夹中的所有 PDF  
+  Batch processing of all PDFs in a folder
+- ✅ 向量化（Embedding）并存储到 Elasticsearch  
+  Vectorization (Embedding) and storage to Elasticsearch
 
-#### 3. **智能问答系统**
-- ✅ LLM 生成答案（支持多种模型：通义千问、DeepSeek、Ollama 等）
-- ✅ **自动引用来源**：显示文件名和页码
-- ✅ **相关性检查**：检测问题与文档库的相关性，不相关时提示用户
-- ✅ **页码过滤**：自动过滤文本开头的页码，避免重复显示
+#### 2. **混合检索系统 / Hybrid Search System**
+- ✅ **关键词检索（BM25）**：精确匹配关键词  
+  **Keyword Search (BM25)**: Exact keyword matching
+- ✅ **向量检索**：语义相似度搜索  
+  **Vector Search**: Semantic similarity search
+- ✅ **RRF 融合**：Reciprocal Rank Fusion 算法融合两种检索结果  
+  **RRF Fusion**: Reciprocal Rank Fusion algorithm to merge two retrieval results
+- ✅ **可选重排序**：Reranker 模型进一步优化排序（可选）  
+  **Optional Reranking**: Reranker model for further ranking optimization (optional)
 
-#### 4. **高级增强能力**
-- ✅ 查询改写（RAG Fusion）
-- ✅ 指代消解（Coreference Resolution）
-- ✅ 查询拆分（Query Decomposition）
-- ✅ Web 搜索作为知识补充
+#### 3. **智能问答系统 / Intelligent Q&A System**
+- ✅ LLM 生成答案（支持多种模型：通义千问、DeepSeek、Ollama 等）  
+  LLM answer generation (supports multiple models: Qwen, DeepSeek, Ollama, etc.)
+- ✅ **自动引用来源**：显示文件名和页码  
+  **Automatic Citation**: Displays filename and page number
+- ✅ **相关性检查**：检测问题与文档库的相关性，不相关时提示用户  
+  **Relevance Check**: Detects relevance between query and document library, prompts user when irrelevant
+- ✅ **页码过滤**：自动过滤文本开头的页码，避免重复显示  
+  **Page Number Filtering**: Automatically filters page numbers at text start to avoid duplication
 
-### 📊 系统架构
+#### 4. **高级增强能力 / Advanced Enhancement Capabilities**
+- ✅ 查询改写（RAG Fusion）  
+  Query rewriting (RAG Fusion)
+- ✅ 指代消解（Coreference Resolution）  
+  Coreference resolution
+- ✅ 查询拆分（Query Decomposition）  
+  Query decomposition
+- ✅ Web 搜索作为知识补充  
+  Web search as knowledge supplement
+
+### 📊 系统架构 / System Architecture
 
 ```
 用户问题
@@ -48,14 +67,14 @@
 [显示结果] ──→ 答案 + 引用来源（文件名+页码）
 ```
 
-### 一、环境准备
+### 一、环境准备 / Environment Setup
 
-#### 1. Python 依赖
+#### 1. Python 依赖 / Python Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-#### 2. Elasticsearch 本地部署（简便方式）
+#### 2. Elasticsearch 本地部署（简便方式） / Elasticsearch Local Deployment (Easy Method)
 **一键脚本（参考课件）**：
 ```bash
 curl -fsSL https://elastic.co/start-local | sh
@@ -79,7 +98,7 @@ curl http://elastic:ZXKwLNQD@localhost:9200
 ```
 
 
-#### 3. LLM 配置（生成答案用）
+#### 3. LLM 配置（生成答案用） / LLM Configuration (for Answer Generation)
 
 系统支持多种 LLM 模型，推荐按以下顺序选择：
 
@@ -182,14 +201,14 @@ DEEPSEEK_API_KEY=你的_deepseek_key
 
 可按需修改这些配置。
 
-### 二、索引创建
+### 二、索引创建 / Index Creation
 
 使用 `es_functions.py` 创建向量索引：
 ```bash
 python -c "from es_functions import create_elastic_index; create_elastic_index('test_index_1')"
 ```
 
-### 三、文档处理与入库
+### 三、文档处理与入库 / Document Processing & Ingestion
 
 #### 基本用法
 
@@ -281,7 +300,7 @@ python -c "from ingest_images_tables import ingest_images; ingest_images('test_i
 python -c "from ingest_images_tables import ingest_tables; ingest_tables('test_index_1', 'test_pdf/另一个PDF.pdf')"
 ```
 
-### 四、RAG 系统启动（推荐：统一入口）
+### 四、RAG 系统启动（推荐：统一入口） / RAG System Startup (Recommended: Unified Entry)
 
 **启动 RAG 系统主界面**（推荐方式）：
 ```bash
@@ -331,7 +350,7 @@ python rag_system.py --index test_index_1 --use-local
 - 如果索引是用**远程服务**创建的（选项3时选择了 `n`），检索时也要选择使用远程服务
 - 模型不一致会导致检索结果完全不同！
 
-### 五、分步启动（可选）
+### 五、分步启动（可选） / Step-by-Step Startup (Optional)
 
 如果你更喜欢分步操作，也可以单独使用：
 
@@ -391,7 +410,7 @@ python rag_system.py --index test_index_1 --rerank
 python rag_system.py --index test_index_1 --use-local
 ```
 
-### 六、检索系统详解
+### 六、检索系统详解 / Retrieval System Details
 
 #### 检索流程说明
 
@@ -445,7 +464,7 @@ python -c "from retrieve_documents import elastic_search; idx='test_index_1'; q=
 - 结果稳定，每次运行排序一致
 - 这是**推荐的使用方式**，通常已足够准确
 
-### 七、方案2：使用 Reranker 做最终排序（可选）
+### 七、方案2：使用 Reranker 做最终排序（可选） / Option 2: Using Reranker for Final Ranking (Optional)
 
 **✅ 方案2：使用 Reranker Model 做最终排序**：
 ```bash
@@ -481,7 +500,7 @@ results = elastic_search('刑事诉讼法 基本原则', 'test_index_1')
 reranked = rerank('刑事诉讼法 基本原则', results[:10])
 ```
 
-### 八、高级增强能力
+### 八、高级增强能力 / Advanced Enhancement Capabilities
 
 - 查询改写（RAG Fusion）：
 ```python
@@ -505,7 +524,7 @@ from retrieve_documents import query_decompositon
 print(query_decompositon('Find EVs >300 miles under $40k and eco-friendly'))
 ```
 
-### 九、多模态：PDF 图片/表格
+### 九、多模态：PDF 图片/表格 / Multimodal: PDF Images/Tables
 
 #### 测试图片和表格提取（仅提取，不入库）
 
@@ -552,7 +571,7 @@ python -c "from retrieve_documents import elastic_search; res=elastic_search('�
 - 确保 `image_table.py` 中填入可用的 `api_key` 或由网关托管
 - 详细测试步骤见 `test_images_tables.md`
 
-### 十、Web 搜索作为 RAG
+### 十、Web 搜索作为 RAG / Web Search as RAG
 
 ```python
 from websearch import bocha_web_search, ask_llm
@@ -561,7 +580,7 @@ webctx = bocha_web_search(query)
 print(ask_llm(query, webctx))
 ```
 
-### 十一、代码结构说明
+### 十一、代码结构说明 / Code Structure
 
 #### 核心文件说明
 
@@ -608,7 +627,7 @@ print(ask_llm(query, webctx))
 - **元数据管理**：文件名、页码、文档类型等元数据完整存储
 - **相关性检查**：基于 RRF 分数判断相关性，提升答案质量
 
-### 十二、常见问题（FAQ）
+### 十二、常见问题（FAQ） / Frequently Asked Questions (FAQ)
 
 **Q: Elasticsearch 连接失败？**
 - 检查 `config.py` 的 `ElasticConfig.url` 与本地 ES 是否运行
